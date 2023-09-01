@@ -7,17 +7,12 @@ CREATE DATABASE universidad;
 \c universidad;
 
 CREATE TYPE Telefono AS(
-
 lada varchar(3),
-
 numT varchar(8));
 
 CREATE TYPE Direccion AS(
-
 calle varchar(30),
-
 num int,
-
 col varchar(30));
 
 CREATE TABLE ClaveCarrera (
@@ -65,11 +60,8 @@ apPaterno VARCHAR(35),
 apMaterno VARCHAR(35),
 fechaNac DATE,
 edad INT,
-
 celular Telefono,
-
 telefono Telefono,
-
 direccion Direccion,
 email VARCHAR(35),
 beca VARCHAR(45),
@@ -178,41 +170,41 @@ VALUES (101, 'Programación I', 4, 64, 2), (102, 'Cálculo I', 4, 64, 1), (103, 
 
 INSERT INTO Profesores (numControl, nombre, apPaterno, apMaterno, tipoContrato, materiaEsp, direccion, telefono, celular, tipoEstudios, email, fechaNac, lugarEstudios)
 VALUES
-(1001, 'Juan', 'Lopez', 'Gomez', 1, 'Programación',
+(1, 'Juan', 'Lopez', 'Gomez', 1, 'Programación',
 ROW('Calle Principal', 123, 'Colonia Centro'),
 ROW('456', '56789012'),
 ROW('789', '12345678'),
 2, 'juan@example.com', '1980-03-25', 'Universidad A'),
 
-(1002, 'Maria', 'Martinez', 'Rodriguez', 2, 'Matemáticas',
+(2, 'Maria', 'Martinez', 'Rodriguez', 2, 'Matemáticas',
 ROW('Avenida Central', 456, 'Colonia Norte'),
 ROW('890', '67890123'),
 ROW('123', '23456789'),
 3, 'maria@example.com', '1975-08-10', 'Universidad B'),
 
-(1003, 'Carlos', 'Garcia', 'Fernandez', 1, 'Física',
+(3, 'Carlos', 'Garcia', 'Fernandez', 1, 'Física',
 ROW('Calle Secundaria', 789, 'Colonia Sur'),
 ROW('234', '34567890'),
 ROW('567', '78901234'),
 2, 'carlos@example.com', '1988-11-15', 'Universidad C'),
 
-(1004, 'Yuliana', 'Berumen', 'Diaz', 2, 'Historia',
+(4, 'Yuliana', 'Berumen', 'Diaz', 2, 'Historia',
 ROW('Avenida Primera', 101, 'Colonia Oeste'),
 ROW('345', '45678901'),
 ROW('678', '56789012'),
 3, 'yuliana@example.com', '1985-06-12', 'Universidad D'),
 
-(1005, 'Carlos', 'Ceron', 'Alvarez', 1, 'Química',
+(5, 'Carlos', 'Ceron', 'Alvarez', 1, 'Química',
 ROW('Boulevard Norte', 505, 'Colonia Este'),
 ROW('456', '56789012'),
 ROW('789', '12345678'),
 2, 'carlos_c@example.com', '1977-09-18', 'Universidad E');
 
 INSERT INTO Cursos (nrc, horario, cupo, fkProfesor, fkMateria, fkSemestre)
-VALUES ('95040', 'Lun 10-12', 30, 1001, 101, '1ER'), ('96536', 'Mar 14-16', 25, 1002, 102, '2DO'), ('98767', 'Mié 08-10', 40, 1003, 103, '3RO');
+VALUES ('95040', 'Lun 10-12', 30, 4, 101, '1ER'), ('96536', 'Mar 14-16', 25, 5, 102, '2DO'), ('98767', 'Mié 08-10', 40, 3, 103, '3RO');
 
 INSERT INTO CursoAlumno (fkMatricula, fkCurso, calificacion, cantintentos)
-VALUES (12345, '95040', 85, 1), (54321, '96536', 70, 2), (98765, '98767', 95, 1);
+VALUES (12345, '95040', 8, 1), (54321, '96536', 7, 2), (98765, '98767', 9, 1);
 
 INSERT INTO CursoSalon (fkCurso, fkSalon, dia, hora, mes)
 VALUES ('95040', 11, 1, '10:00', 1), ('96536', 12, 2, '14:00', 2), ('98767', 13, 3, '08:00', 3);
@@ -241,6 +233,12 @@ VALUES ('95040', 11, 1, '10:00', 1), ('96536', 12, 2, '14:00', 2), ('98767', 13,
 	SELECT * FROM Alumnos WHERE edad = 22;
 
 5.Ver los cursos donde los maestros sean 'Yuliana Berumen Diaz' y 'Carlos Ceron Alvarez'.
+	SELECT C.nrc, C.horario
+	FROM Cursos C
+	JOIN Profesores P ON C.fkProfesor = P.numControl
+	WHERE P.nombre = 'Yuliana' AND P.apPaterno = 'Berumen' AND P.apMaterno = 'Diaz'
+	   OR P.nombre = 'Carlos' AND P.apPaterno = 'Ceron' AND P.apMaterno = 'Alvarez';
+
 
 6. Ver las matriculas de los alumnos cuyas calificaciones no estan entre 10,9,8.
 	SELECT DISTINCT ca.fkMatricula
@@ -254,8 +252,24 @@ VALUES ('95040', 11, 1, '10:00', 1), ('96536', 12, 2, '14:00', 2), ('98767', 13,
 	SELECT * FROM Profesores WHERE materiaEsp <> 'Base de Datos';
 
 9. Borrar al profeso cuyo ID sea el 5.
+	DELETE FROM Profesores WHERE numControl = 5;
 10.Listar matricula y nombre de los alumnos que esten cursando la materia de 'Calculo de una Variable' en el curso con NRC '95040'
+	SELECT A.matricula, A.nombre
+	FROM Alumnos A
+	JOIN CursoAlumno CA ON A.matricula = CA.fkMatricula
+	JOIN Cursos C ON CA.fkCurso = C.nrc
+	JOIN Materias M ON C.fkMateria = M.codigo
+	WHERE M.nombre = 'Cálculo de una Variable' AND C.nrc = '95040';
+
 11. Mostrar el nombre completo de los profesores
+	SELECT CONCAT(nombre, ' ', apPaterno, ' ', apMaterno) AS nombre_completo FROM Profesores;
+
 12. Mostrar la lada de los telefonos de los alumnos
+	SELECT celular.lada AS lada_celular, telefono.lada AS lada_telefono
+	FROM Alumnos;
+
 13. Mostar la fecha de nacimiento de los alumnos con el siguiente formato: Año-Dia.Mes('yyy-dd-mm')
+	SELECT TO_CHAR(fechaNac, 'YYYY-DD-MM') AS fecha_nacimiento FROM Alumnos;
+
 14 Mostrar la calificacion promedio de los alumnos
+	SELECT AVG(calificacion) AS calificacion_promedio FROM CursoAlumno;
