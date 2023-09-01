@@ -1,0 +1,185 @@
+-- Yahir Lagunes Ceballos
+
+-- CREACION DE BASE Y TABLAS
+
+CREATE DATABASE universidad;
+
+\c universidad;
+
+CREATE TABLE ClaveCarrera (
+idCarrera VARCHAR(6) PRIMARY KEY,
+nombreCarrera VARCHAR(50)
+);
+
+CREATE TABLE Semestres (
+codSemestre VARCHAR(7) PRIMARY KEY,
+numSemestre INT
+);
+
+CREATE TABLE TipoContrato (
+idContrato SERIAL PRIMARY KEY,
+nombreTipo VARCHAR(16)
+);
+
+CREATE TABLE TipoEstudios (
+idEstudios SERIAL PRIMARY KEY,
+nombreTipo VARCHAR(15)
+);
+
+CREATE TABLE TipoMateria (
+idTipoMateria SERIAL PRIMARY KEY,
+nombreTipo VARCHAR(20)
+);
+
+CREATE TABLE Salones (
+codSalon INT PRIMARY KEY,
+lugar VARCHAR(10),
+pupitres INT
+);
+
+CREATE TABLE Meses (
+idMes INT PRIMARY KEY,
+nombreMes VARCHAR(11)
+);
+
+CREATE TABLE Alumnos (
+matricula SERIAL PRIMARY KEY,
+semestre INT,
+claveCarrera VARCHAR(6),
+nombre VARCHAR(35),
+apPaterno VARCHAR(35),
+apMaterno VARCHAR(35),
+fechaNac DATE,
+edad INT,
+email VARCHAR(35),
+beca VARCHAR(45),
+FOREIGN KEY (claveCarrera) REFERENCES ClaveCarrera (idCarrera)
+);
+
+CREATE TABLE Materias (
+codigo SERIAL PRIMARY KEY,
+nombre VARCHAR(50),
+creditos INT,
+numHoras INT,
+tipoMateria INT,
+FOREIGN KEY (tipoMateria) REFERENCES TipoMateria (idTipoMateria)
+);
+
+CREATE TABLE Profesores (
+numControl SERIAL PRIMARY KEY,
+nombre VARCHAR(35),
+apPaterno VARCHAR(35),
+apMaterno VARCHAR(35),
+tipoContrato INT,
+materiaEsp VARCHAR(30),
+tipoEstudios INT,
+email VARCHAR(35),
+fechaNac DATE,
+lugarEstudios VARCHAR(40),
+FOREIGN KEY (tipoContrato) REFERENCES TipoContrato (idContrato),
+FOREIGN KEY (tipoEstudios) REFERENCES TipoEstudios (idEstudios)
+);
+
+CREATE TABLE Cursos (
+nrc VARCHAR(5) PRIMARY KEY,
+horario VARCHAR(12),
+cupo INT,
+fkProfesor INT,
+fkMateria INT,
+fkSemestre VARCHAR(7),
+FOREIGN KEY (fkProfesor) REFERENCES Profesores (numControl),
+FOREIGN KEY (fkMateria) REFERENCES Materias (codigo),
+FOREIGN KEY (fkSemestre) REFERENCES Semestres (codSemestre)
+);
+
+CREATE TABLE CursoAlumno (
+fkMatricula INT,
+fkCurso VARCHAR(6),
+calificacion INT,
+cantintentos INT,
+FOREIGN KEY (fkMatricula) REFERENCES Alumnos (matricula),
+FOREIGN KEY (fkCurso) REFERENCES Cursos (nrc)
+);
+
+CREATE TABLE CursoSalon (
+fkCurso VARCHAR(6),
+fkSalon INT,
+dia INT,
+hora TIME,
+mes INT,
+FOREIGN KEY (fkCurso) REFERENCES Cursos (nrc),
+FOREIGN KEY (fkSalon) REFERENCES Salones (codSalon),
+FOREIGN KEY (mes) REFERENCES Meses (idMes)
+);
+
+
+
+
+-- LLENADO
+
+INSERT INTO ClaveCarrera (idCarrera, nombreCarrera) VALUES ('IINF', 'INGENIERIA EN INFORMATICA'), ('MCTR', 'INGENIERIA EN MECATRONICA'),('ELCO', 'INGENIERIA EN ELECTRONICA Y COMUNICACIONES');
+INSERT INTO Semestres (codSemestre, numSemestre) VALUES ('1ER', 1), ('2DO', 2), ('3RO', 3), ('4TO', 4), ('5TO', 5), ('6TO', 6), ('7MO', 7), ('8VO', 8), ('9NO', 9), ('10MO', 10), ('11RO', 11), ('12DO', 12), ('13RO', 13), ('14TO', 14);
+
+INSERT INTO TipoContrato (nombreTipo) VALUES ('ESCOLARIZADO'), ('SABATINO'), ('EN LINEA');
+INSERT INTO TipoEstudios (nombreTipo) VALUES ('POSGRADO'), ('MAESTRIA'), ('DOCTORADO');
+
+INSERT INTO TipoMateria (nombreTipo) VALUES ('BASICA'), ('DISCIPLINARIA'), ('TERMINAL'), ('AFEL');
+INSERT INTO Salones (codSalon, lugar, pupitres) VALUES (11, 'Edificio F', 30), (12, 'Edificio F', 27), (13, 'Edificio F', 29), (14, 'Edificio F', 32), (15, 'Edificio F', 26), (16, 'Edificio F', 33), (17, 'Edificio F', 31), (18, 'Edificio F', 28), (19, 'Edificio F', 34), (20, 'Edificio F', 25), (21, 'Edificio F', 30), (22, 'Edificio F', 27), (23, 'Edificio F', 29), (24, 'Edificio F', 32), (25, 'Edificio F', 26), (26, 'Edificio F', 33);
+
+INSERT INTO Meses (idMes, nombreMes) VALUES (1, 'Enero'), (2, 'Febrero'), (3, 'Marzo'), (4, 'Abril'), (5, 'Mayo'), (6, 'Junio'), (7, 'Julio'), (8, 'Agosto'), (9, 'Septiembre'), (10, 'Octubre'), (11, 'Noviembre'), (12, 'Diciembre');
+
+INSERT INTO Alumnos (matricula, semestre, claveCarrera, nombre, apPaterno, apMaterno, fechaNac, edad, email, beca)
+VALUES (12345, 3, 'IINF', 'Juan', 'Perez', 'Gomez', '2000-05-15', 21, 'juan@example.com', 'Completa'), (54321, 2, 'MCTR', 'Maria', 'Lopez', 'Rodriguez', '2001-01-10', 22, 'maria@example.com', 'Media'), (98765, 4, 'ELCO', 'Carlos', 'Garcia', 'Martinez', '1999-08-22', 23, 'carlos@example.com', 'Ninguna');
+INSERT INTO Materias (codigo, nombre, creditos, numHoras, tipoMateria)
+VALUES (101, 'Programación I', 4, 64, 2), (102, 'Cálculo I', 4, 64, 1), (103, 'Física I', 3, 48, 1);
+INSERT INTO Profesores (numControl, nombre, apPaterno, apMaterno, tipoContrato, materiaEsp, tipoEstudios, email, fechaNac, lugarEstudios)
+VALUES (1001, 'Juan', 'Lopez', 'Gomez', 1, 'Programación', 2, 'juan@example.com', '1980-03-25', 'Universidad A'), (1002, 'Maria', 'Martinez', 'Rodriguez', 2, 'Matemáticas', 3, 'maria@example.com', '1975-08-10', 'Universidad B'), (1003, 'Carlos', 'Garcia', 'Fernandez', 1, 'Física', 2, 'carlos@example.com', '1988-11-15', 'Universidad C'), (1004, 'Yuliana', 'Berumen', 'Diaz', 2, 'Historia', 3, 'yuliana@example.com', '1985-06-12', 'Universidad D'), (1005, 'Carlos', 'Ceron', 'Alvarez', 1, 'Química', 2, 'carlos_c@example.com', '1977-09-18', 'Universidad E');
+INSERT INTO Cursos (nrc, horario, cupo, fkProfesor, fkMateria, fkSemestre)
+VALUES ('C001', 'Lun 10-12', 30, 1001, 101, '1ER'), ('C002', 'Mar 14-16', 25, 1002, 102, '2DO'), ('C003', 'Mié 08-10', 40, 1003, 103, '3RO');
+INSERT INTO CursoAlumno (fkMatricula, fkCurso, calificacion, cantintentos)
+VALUES (12345, 'C001', 85, 1), (54321, 'C002', 70, 2), (98765, 'C003', 95, 1);
+INSERT INTO CursoSalon (fkCurso, fkSalon, dia, hora, mes)
+VALUES ('C001', 11, 1, '10:00', 1), ('C002', 12, 2, '14:00', 2), ('C003', 13, 3, '08:00', 3);
+
+
+
+
+
+-- CONSULTAS
+
+1.Listar matricula,nombre,carrera y semestre de todos los alumnos que estan en la universidad.
+	SELECT matricula, nombre, claveCarrera, semestre
+	FROM Alumnos;
+
+2.Concatenar nombre y apellidos de la tabla profesores y ordenar por apellido paterno
+	SELECT CONCAT(nombre, ' ', apPaterno, ' ', apMaterno) AS nombre_completo
+	FROM Profesores
+	ORDER BY apPaterno;
+
+3.Listar matricula y nombre de los alumnos de las carreras de 'IINF' y 'MCTR'
+	SELECT matricula, nombre
+	FROM Alumnos
+	WHERE claveCarrera IN ('IINF', 'MCTR');
+
+4.Ver todos los datos de los alumnos cuya edad sea de 22 años
+	SELECT * FROM Alumnos WHERE edad = 22;
+
+5.Ver los cursos donde los maestros sean 'Yuliana Berumen Diaz' y 'Carlos Ceron Alvarez'.
+
+6. Ver las matriculas de los alumnos cuyas calificaciones no estan entre 10,9,8.
+	SELECT DISTINCT ca.fkMatricula
+	FROM CursoAlumno ca
+	WHERE ca.calificacion NOT IN (10, 9, 8);
+
+7. Mostrar los alumnos cuto nombre empiece con 'E'
+	SELECT * FROM Alumnos WHERE nombre LIKE 'E%';
+
+8 Ver toda la informacion de los profesores cuya materia sea diferente de 'Base de Datos'
+	SELECT * FROM Profesores WHERE materiaEsp <> 'Base de Datos';
+
+9. Borrar al profeso cuyo ID sea el 5.
+10.Listar matricula y nombre de los alumnos que esten cursando la materia de 'Calculo de una Variable' en el curso con NRC '95040'
+11. Mostrar el nombre completo de los profesores
+12. Mostrar la lada de los telefonos de los alumnos
+13. Mostar la fecha de nacimiento de los alumnos con el siguiente formato: Año-Dia.Mes('yyy-dd-mm')
+14 Mostrar la calificacion promedio de los alumnos
