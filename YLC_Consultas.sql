@@ -37,7 +37,11 @@
 	SELECT * FROM Profesores WHERE materiaEsp <> 'Base de Datos';
 
 -- 9. Borrar al profeso cuyo ID sea el 5.
+	DELETE FROM CursoSalon WHERE fkCurso IN (SELECT nrc FROM Cursos WHERE fkProfesor = 5);
+	DELETE FROM CursoAlumno WHERE fkCurso IN (SELECT nrc FROM Cursos WHERE fkProfesor = 5);
+	DELETE FROM Cursos WHERE fkProfesor = 5;
 	DELETE FROM Profesores WHERE numControl = 5;
+
 -- 10.Listar matricula y nombre de los alumnos que esten cursando la materia de 'Calculo de una Variable' en el curso con NRC '95040'
 	SELECT A.matricula, A.nombre
 	FROM Alumnos A
