@@ -91,7 +91,7 @@ VALUES (101, 'Programación I', 4, 64, 2),
   (106, 'Introducción a la Robótica', 4, 64, 2),
   (107, 'Química Orgánica', 4, 64, 2), 
   (108, 'Programación II', 4, 64, 2), 
-  (109, 'Cálculo II', 4, 64, 1);
+  (95040, 'Cálculo de una variable', 4, 64, 1);
 
 INSERT INTO Profesores (numControl, nombre, apPaterno, apMaterno, tipoContrato, materiaEsp, direccion, telefono, celular, tipoEstudios, email, fechaNac, lugarEstudios)
 VALUES
@@ -158,7 +158,7 @@ VALUES ('95040', 'Lun 10-12', 30, 4, 101, '1ER'),
   ('99765', 'Mié 08-10', 35, 4, 106, '3RO'),
   ('97544', 'Lun 14-16', 25, 8, 107, '1ER'), 
   ('98322', 'Mar 08-10', 30, 9, 108, '2DO'), 
-  ('99766', 'Mié 10-12', 35, 4, 109, '3RO'),
+  ('99766', 'Mié 10-12', 35, 4, 95040, '3RO'),
   ('97545', 'Jue 14-16', 28, 6, 104, '1ER'), 
   ('98323', 'Vie 08-10', 32, 7, 105, '2DO');
 
