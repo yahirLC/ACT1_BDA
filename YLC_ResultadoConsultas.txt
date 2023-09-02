@@ -1,1 +1,219 @@
+Server [localhost]:
+Database [postgres]:
+Port [5432]:
+Username [postgres]:
+Contraseña para usuario postgres:
+psql (16rc1)
+ADVERTENCIA: El código de página de la consola (850) difiere del código
+            de página de Windows (1252).
+            Los caracteres de 8 bits pueden funcionar incorrectamente.
+            Vea la página de referencia de psql «Notes for Windows users»
+            para obtener más detalles.
+Digite «help» para obtener ayuda.
 
+postgres=# \c universidad;
+Ahora está conectado a la base de datos «universidad» con el usuario «postgres».
+universidad=# -- CONSULTAS
+universidad=#
+universidad=# -- 1.Listar matricula,nombre,carrera y semestre de todos los alumnos que estan en la universidad.
+universidad=#   SELECT matricula, nombre, claveCarrera, semestre
+universidad-#   FROM Alumnos;
+ matricula |  nombre   | clavecarrera | semestre
+-----------+-----------+--------------+----------
+     12345 | Juan      | IINF         |        3
+     54321 | Maria     | MCTR         |        2
+     98765 | Enrique   | ELCO         |        4
+     67890 | Laura     | IINF         |        2
+     45678 | Alejandro | MCTR         |        5
+     23456 | Sofia     | ELCO         |        3
+     34567 | Eliezert  | IINF         |        4
+     78901 | Ana       | MCTR         |        6
+     12340 | Javier    | ELCO         |        5
+(9 filas)
+
+
+universidad=#
+universidad=# -- 2.Concatenar nombre y apellidos de la tabla profesores y ordenar por apellido paterno
+universidad=#   SELECT CONCAT(nombre, ' ', apPaterno, ' ', apMaterno) AS nombre_completo
+universidad-#   FROM Profesores
+universidad-#   ORDER BY apPaterno;
+     nombre_completo
+--------------------------
+ Yuliana Berumen Diaz
+ Elena Diaz Garcia
+ Carlos Garcia Fernandez
+ Ana Gonzalez Hernandez
+ Juan Lopez Gomez
+ Maria Martinez Rodriguez
+ Fernando Perez Hernandez
+ Luis Rodriguez Vargas
+(8 filas)
+
+
+universidad=#
+universidad=# -- 3.Listar matricula y nombre de los alumnos de las carreras de 'IINF' y 'MCTR'
+universidad=#   SELECT matricula, nombre
+universidad-#   FROM Alumnos
+universidad-#   WHERE claveCarrera IN ('IINF', 'MCTR');
+ matricula |  nombre
+-----------+-----------
+     12345 | Juan
+     54321 | Maria
+     67890 | Laura
+     45678 | Alejandro
+     34567 | Eliezert
+     78901 | Ana
+(6 filas)
+
+
+universidad=#
+universidad=# -- 4.Ver todos los datos de los alumnos cuya edad sea de 22 años
+universidad=#   SELECT * FROM Alumnos WHERE edad = 22;
+ matricula | semestre | clavecarrera | nombre | appaterno | apmaterno |  fechanac  | edad |    celular     |    telefono    |                direccion                 |       email       | beca
+-----------+----------+--------------+--------+-----------+-----------+------------+------+----------------+----------------+------------------------------------------+-------------------+-------
+     54321 |        2 | MCTR         | Maria  | Lopez     | Rodriguez | 2001-01-10 |   22 | (234,23456789) | (567,67890123) | ("Avenida Central",456,"Colonia Norte")  | maria@example.com | Media
+     23456 |        3 | ELCO         | Sofia  | Fernandez | Perez     | 2001-07-15 |   22 | (123,34567890) | (456,78901234) | ("Calle Principal",101,"Colonia Centro") | sofia@example.com | Media
+(2 filas)
+
+
+universidad=#
+universidad=# -- 5.Ver los cursos donde los maestros sean 'Yuliana Berumen Diaz' y 'Carlos Ceron Alvarez'.
+universidad=#   SELECT C.nrc, C.horario
+universidad-#   FROM Cursos C
+universidad-#   JOIN Profesores P ON C.fkProfesor = P.numControl
+universidad-#   WHERE P.nombre = 'Yuliana' AND P.apPaterno = 'Berumen' AND P.apMaterno = 'Diaz'
+universidad-#      OR P.nombre = 'Carlos' AND P.apPaterno = 'Ceron' AND P.apMaterno = 'Alvarez';
+  nrc  |  horario
+-------+-----------
+ 95040 | Lun 10-12
+ 99765 | Mié 08-10
+ 99766 | Mié 10-12
+(3 filas)
+
+
+universidad=#
+universidad=#
+universidad=# -- 6. Ver las matriculas de los alumnos cuyas calificaciones no estan entre 10,9,8.
+universidad=#   SELECT DISTINCT ca.fkMatricula
+universidad-#   FROM CursoAlumno ca
+universidad-#   WHERE ca.calificacion NOT IN (10, 9, 8);
+ fkmatricula
+-------------
+       67890
+       34567
+       12340
+(3 filas)
+
+
+universidad=#
+universidad=# -- 7. Mostrar los alumnos cuto nombre empiece con 'E'
+universidad=#   SELECT * FROM Alumnos WHERE nombre LIKE 'E%';
+ matricula | semestre | clavecarrera |  nombre  | appaterno | apmaterno |  fechanac  | edad |    celular     |    telefono    |                direccion                |       email        |   beca
+-----------+----------+--------------+----------+-----------+-----------+------------+------+----------------+----------------+-----------------------------------------+--------------------+----------
+     98765 |        4 | ELCO         | Enrique  | Garcia    | Martinez  | 1999-08-22 |   23 | (345,34567890) | (678,78901234) | ("Calle Secundaria",789,"Colonia Sur")  | carlos@example.com | Ninguna
+     34567 |        4 | IINF         | Eliezert | Sanchez   | Lopez     | 2000-09-18 |   21 | (567,23456789) | (890,12345678) | ("Calle de la Luna",234,"Colonia Este") | pedro@example.com  | Completa
+(2 filas)
+
+
+universidad=#
+universidad=# -- 8 Ver toda la informacion de los profesores cuya materia sea diferente de 'Base de Datos'
+universidad=#   SELECT * FROM Profesores WHERE materiaEsp <> 'Base de Datos';
+ numcontrol |  nombre  | appaterno | apmaterno | tipocontrato |         materiaesp         |                  direccion                  |    telefono    |    celular     | tipoestudios |        email         |  fechanac  | lugarestudios
+------------+----------+-----------+-----------+--------------+----------------------------+---------------------------------------------+----------------+----------------+--------------+----------------------+------------+---------------
+          1 | Juan     | Lopez     | Gomez     |            1 | Programación               | ("Calle Principal",123,"Colonia Centro")    | (456,56789012) | (789,12345678) |            2 | juan@example.com     | 1980-03-25 | Universidad A
+          2 | Maria    | Martinez  | Rodriguez |            2 | Matemáticas                | ("Avenida Central",456,"Colonia Norte")     | (890,67890123) | (123,23456789) |            3 | maria@example.com    | 1975-08-10 | Universidad B
+          3 | Carlos   | Garcia    | Fernandez |            1 | Física                     | ("Calle Secundaria",789,"Colonia Sur")      | (234,34567890) | (567,78901234) |            2 | carlos@example.com   | 1988-11-15 | Universidad C
+          4 | Yuliana  | Berumen   | Diaz      |            2 | Historia                   | ("Avenida Primera",101,"Colonia Oeste")     | (345,45678901) | (678,56789012) |            3 | yuliana@example.com  | 1985-06-12 | Universidad D
+          6 | Ana      | Gonzalez  | Hernandez |            2 | Inglés                     | ("Calle del Bosque",567,"Colonia Norte")    | (789,23456789) | (123,45678901) |            3 | ana@example.com      | 1972-09-08 | Universidad F
+          7 | Luis     | Rodriguez | Vargas    |            1 | Introducción a la Robótica | ("Avenida Principal",202,"Colonia Sur")     | (123,56789012) | (234,78901234) |            2 | luis@example.com     | 1978-04-17 | Universidad G
+          8 | Elena    | Diaz      | Garcia    |            2 | Química Orgánica           | ("Calle de la Montaña",789,"Colonia Norte") | (234,78901234) | (567,12345678) |            3 | elena@example.com    | 1973-06-30 | Universidad H
+          9 | Fernando | Perez     | Hernandez |            1 | Programación II            | ("Avenida del Mar",123,"Colonia Sur")       | (901,56789012) | (234,23456789) |            2 | fernando@example.com | 1982-03-15 | Universidad I
+(8 filas)
+
+
+universidad=#
+universidad=# -- 9. Borrar al profeso cuyo ID sea el 5.
+universidad=#   DELETE FROM CursoSalon WHERE fkCurso IN (SELECT nrc FROM Cursos WHERE fkProfesor = 5);
+DELETE 0
+universidad=#   DELETE FROM CursoAlumno WHERE fkCurso IN (SELECT nrc FROM Cursos WHERE fkProfesor = 5);
+DELETE 0
+universidad=#   DELETE FROM Cursos WHERE fkProfesor = 5;
+DELETE 0
+universidad=#   DELETE FROM Profesores WHERE numControl = 5;
+DELETE 0
+universidad=#
+universidad=# -- 10.Listar matricula y nombre de los alumnos que esten cursando la materia de 'Calculo de una Variable' en el curso con NRC '95040'
+universidad=#   SELECT A.matricula, A.nombre
+universidad-#   FROM Alumnos A
+universidad-#   JOIN CursoAlumno CA ON A.matricula = CA.fkMatricula
+universidad-#   JOIN Cursos C ON CA.fkCurso = C.nrc
+universidad-#   JOIN Materias M ON C.fkMateria = M.codigo
+universidad-#   WHERE M.nombre = 'Cálculo de una Variable' AND C.nrc = '95040';
+ matricula |  nombre
+-----------+-----------
+     12345 | Juan
+     54321 | Maria
+     45678 | Alejandro
+
+
+
+universidad=#
+universidad=# -- 11. Mostrar el nombre completo de los profesores
+universidad=#   SELECT CONCAT(nombre, ' ', apPaterno, ' ', apMaterno) AS nombre_completo FROM Profesores;
+     nombre_completo
+--------------------------
+ Juan Lopez Gomez
+ Maria Martinez Rodriguez
+ Carlos Garcia Fernandez
+ Yuliana Berumen Diaz
+ Ana Gonzalez Hernandez
+ Luis Rodriguez Vargas
+ Elena Diaz Garcia
+ Fernando Perez Hernandez
+(8 filas)
+
+
+universidad=#
+universidad=# -- 12. Mostrar la lada de los telefonos de los alumnos
+universidad=#   SELECT celular.lada AS lada_celular, telefono.lada AS lada_telefono
+universidad-#   FROM Alumnos;
+     lada_celular
+--------------------------
+123
+456
+789
+234
+567
+890
+345
+678
+901
+(8 filas)
+
+universidad=#
+universidad=# -- 13. Mostar la fecha de nacimiento de los alumnos con el siguiente formato: Año-Dia.Mes('yyy-dd-mm')
+universidad=#   SELECT TO_CHAR(fechaNac, 'YYYY-DD-MM') AS fecha_nacimiento FROM Alumnos;
+ fecha_nacimiento
+------------------
+ 2000-15-05
+ 2001-10-01
+ 1999-22-08
+ 2002-20-03
+ 1999-05-12
+ 2001-15-07
+ 2000-18-09
+ 1998-25-02
+ 1999-10-11
+(9 filas)
+
+
+universidad=#
+universidad=# -- 14 Mostrar la calificacion promedio de los alumnos
+universidad=#   SELECT AVG(calificacion) AS calificacion_promedio FROM CursoAlumno;
+ calificacion_promedio
+-----------------------
+    8.0500000000000000
+(1 fila)
+
+
+universidad=#
